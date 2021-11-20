@@ -1,19 +1,21 @@
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import actions from "../../redux/actions";
+import { useFetchContactsQuery } from "redux/contactSlice";
+import actions from "redux/actions";
 import ContactItem from "./ContactItem";
+import Loader from "components/Loader";
 
-function ContactList({ contacts, onContactDel }) {
+function ContactList() {
+  const { data, isFetching } = useFetchContactsQuery();
+
   return (
-    <ul>
-      {contacts.map((contact) => (
-        <ContactItem
-          key={contact.id}
-          contact={contact}
-          onContactDel={onContactDel}
-        />
-      ))}
-    </ul>
+    <>
+      {isFetching && <Loader />}
+      <ul>
+        {!isFetching &&
+          data.map((contact) => <ContactItem key={contact.id} {...contact} />)}
+      </ul>
+    </>
   );
 }
 

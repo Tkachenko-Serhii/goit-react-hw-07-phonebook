@@ -1,27 +1,28 @@
-import PropTypes from "prop-types";
+import { useDeleteContactMutation } from "redux/contactSlice";
+import { alert } from "@pnotify/core";
+
 import s from "./ContactItem.module.css";
 
-export default function ContactItem({ contact, onContactDel }) {
+export default function ContactItem({ id, name, number }) {
+  const [deleteContact, { isLoading: isDeleting }] = useDeleteContactMutation();
+  isDeleting &&
+    alert({
+      type: "warning",
+      text: `Contact ${name} was deleted!`,
+    });
+
   return (
     <li className={s.item}>
       <p className={s.contact}>
-        {contact.name}: {contact.number}
+        {name}: {number}
       </p>
       <button
         className={s.button}
-        onClick={(e) => onContactDel(e.target.id)}
-        id={contact.id}
+        onClick={(e) => deleteContact(id)}
+        disabled={isDeleting}
       >
-        Delete
+        {isDeleting ? "Deleting..." : "Delete"}
       </button>
     </li>
   );
 }
-
-ContactItem.propTypes = {
-  contact: PropTypes.exact({
-    name: PropTypes.string,
-    number: PropTypes.string,
-    id: PropTypes.string,
-  }),
-};

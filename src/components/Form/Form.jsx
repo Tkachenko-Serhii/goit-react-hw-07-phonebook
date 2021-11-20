@@ -1,18 +1,22 @@
-import { useState } from "react";
 import { connect } from "react-redux";
-import actions from "../../redux/actions";
+import { useCreateContactMutation } from "redux/contactSlice";
+import { alert } from "@pnotify/core";
+import actions from "redux/actions";
 import s from "./Form.module.css";
 
-function Form({ onFormSubmit }) {
-  const [name, setName] = useState("");
-  const [number, setNumber] = useState("");
+function Form() {
+  const [createContact, { isLoading }] = useCreateContactMutation();
 
   const onSubmit = (e) => {
     e.preventDefault();
-    onFormSubmit(name, number);
-    setName("");
-    setNumber("");
-    document.getElementById("form").reset();
+    const name = e.currentTarget.elements.name.value;
+    const number = e.currentTarget.elements.number.value;
+    createContact({ name, number });
+    alert({
+      type: "success",
+      text: `Contact ${name} is saved!`,
+    });
+    e.currentTarget.reset();
   };
 
   return (
@@ -25,11 +29,7 @@ function Form({ onFormSubmit }) {
           pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
           title="Имя может состоять только из букв, апострофа, тире и пробелов. Например Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan и т. п."
           required
-          onChange={(e) => {
-            setName(e.target.value);
-          }}
           className={s.input}
-          value={name}
         />
       </label>
       <label className={s.label}>
@@ -39,15 +39,11 @@ function Form({ onFormSubmit }) {
           name='number'
           pattern='\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}'
           title='Номер телефона должен состоять цифр и может содержать пробелы, тире, круглые скобки и может начинаться с +'
-          onChange={(e) => {
-            setNumber(e.target.value);
-          }}
           className={s.input}
-          value={number}
           required
         />
       </label>
-      <button type='submit' className={s.button}>
+      <button type='submit' className={s.button} disabled={isLoading}>
         Add contact
       </button>
     </form>
