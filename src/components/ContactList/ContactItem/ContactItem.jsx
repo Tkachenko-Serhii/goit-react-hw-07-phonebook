@@ -5,6 +5,7 @@ import s from "./ContactItem.module.css";
 
 export default function ContactItem({ id, name, number }) {
   const [deleteContact, { isLoading: isDeleting }] = useDeleteContactMutation();
+
   isDeleting &&
     alert({
       type: "warning",

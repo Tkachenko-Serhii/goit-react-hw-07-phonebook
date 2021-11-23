@@ -1,21 +1,31 @@
-import { connect } from "react-redux";
-import { useCreateContactMutation } from "redux/contactSlice";
+import {
+  useFetchContactsQuery,
+  useCreateContactMutation,
+} from "redux/contactSlice";
 import { alert } from "@pnotify/core";
-import actions from "redux/actions";
 import s from "./Form.module.css";
 
-function Form() {
+export default function Form() {
+  const { data } = useFetchContactsQuery();
   const [createContact, { isLoading }] = useCreateContactMutation();
 
   const onSubmit = (e) => {
     e.preventDefault();
     const name = e.currentTarget.elements.name.value;
     const number = e.currentTarget.elements.number.value;
-    createContact({ name, number });
-    alert({
-      type: "success",
-      text: `Contact ${name} is saved!`,
-    });
+    if (data.find((el) => el.name.toLowerCase() === name.toLowerCase())) {
+      alert({
+        type: "warning",
+        text: `Contact ${name} is already in your contacts!`,
+      });
+      return;
+    } else {
+      createContact({ name, number });
+      alert({
+        type: "success",
+        text: `Contact ${name} is saved!`,
+      });
+    }
     e.currentTarget.reset();
   };
 
@@ -49,10 +59,3 @@ function Form() {
     </form>
   );
 }
-
-const mapDispatchToProps = (dispatch) => ({
-  onFormSubmit: (name, number) =>
-    dispatch(actions.addContact({ name, number })),
-});
-
-export default connect(null, mapDispatchToProps)(Form);
