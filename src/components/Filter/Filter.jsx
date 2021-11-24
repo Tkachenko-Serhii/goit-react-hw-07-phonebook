@@ -18,6 +18,7 @@ export default function Filter() {
         onChange={onChangeFilter}
         value={stateFilter}
         className={s.input}
+        autoComplete='off'
       />
     </>
   );
